@@ -1,3 +1,9 @@
+# Street View Panoramas (dataset of kaggle)
+archive.zip
+images/*
+images.csv
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
