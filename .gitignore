@@ -2,6 +2,7 @@
 archive.zip
 images/*
 images.csv
+*.csv
 
 
 # Byte-compiled / optimized / DLL files
