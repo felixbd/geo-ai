@@ -1,9 +1,17 @@
 GEO AI
 ======
 
+<!--
 $$\\begin{array}{l} a = \\left\\{ \\begin{array}{ll} a, & \\mathrm{if} \\ a \\ge 0 \\\\ a \\cdot -1 + 90, & \\mathrm{otherwise} \\end{array} \\right. \\\\ b = \\left\\{ \\begin{array}{ll} b, & \\mathrm{if} \\ b \\ge 0 \\\\ b \\cdot -1 + 180, & \\mathrm{otherwise} \\end{array} \\right. \\\\ f(a, b) = \\mathopen{}\\left( \\mathrm{round} \\mathopen{}\\left( \\frac{a \\cdot \\mathrm{X\\_SCALE}}{180} \\mathclose{}\\right), \\mathrm{round} \\mathopen{}\\left( \\frac{b \\cdot \\mathrm{Y\\_SCALE}}{360} \\mathclose{}\\right) \\mathclose{}\\right) \\end{array}$$
+-->
 
+$$f(a, b) = \\mathopen{}\\left( \\mathrm{round} \\mathopen{}\\left( \\frac{\\left\\{ \\begin{array}{ll} a, & \\mathrm{if} \\ a \\ge 0 \\\\ a \\cdot -1 + 90, & \\mathrm{otherwise} \\end{array} \\right. \\cdot \\mathrm{X\\_SCALE}}{180} \\mathclose{}\\right), \\mathrm{round} \\mathopen{}\\left( \\frac{\\left\\{ \\begin{array}{ll} b, & \\mathrm{if} \\ b \\ge 0 \\\\ b \\cdot -1 + 180, & \\mathrm{otherwise} \\end{array} \\right. \\cdot \\mathrm{Y\\_SCALE}}{360} \\mathclose{}\\right) \\mathclose{}\\right)$$
+
+<!--
 $$\\begin{array}{l} a = \\frac{x \\cdot 180}{\\mathrm{X\\_SCALE}} \\\\ b = \\frac{y \\cdot 360}{\\mathrm{Y\\_SCALE}} \\\\ a = \\left\\{ \\begin{array}{ll} a, & \\mathrm{if} \\ a \\le 90 \\\\ \\mathopen{}\\left( a - 90 \\mathclose{}\\right) \\cdot -1, & \\mathrm{otherwise} \\end{array} \\right. \\\\ b = \\left\\{ \\begin{array}{ll} b, & \\mathrm{if} \\ b \\le 180 \\\\ \\mathopen{}\\left( b - 180 \\mathclose{}\\right) \\cdot -1, & \\mathrm{otherwise} \\end{array} \\right. \\\\ \\mathrm{inverse\\_f}(x, y) = \\mathopen{}\\left( a, b \\mathclose{}\\right) \\end{array}$$
+-->
+
+$$\\mathrm{inverse\\_f}(x, y) = \\mathopen{}\\left( \\left\\{ \\begin{array}{ll} \\frac{x \\cdot 180}{\\mathrm{X\\_SCALE}}, & \\mathrm{if} \\ \\frac{x \\cdot 180}{\\mathrm{X\\_SCALE}} \\le 90 \\\\ \\mathopen{}\\left( \\frac{x \\cdot 180}{\\mathrm{X\\_SCALE}} - 90 \\mathclose{}\\right) \\cdot -1, & \\mathrm{otherwise} \\end{array} \\right., \\left\\{ \\begin{array}{ll} \\frac{y \\cdot 360}{\\mathrm{Y\\_SCALE}}, & \\mathrm{if} \\ \\frac{y \\cdot 360}{\\mathrm{Y\\_SCALE}} \\le 180 \\\\ \\mathopen{}\\left( \\frac{y \\cdot 360}{\\mathrm{Y\\_SCALE}} - 180 \\mathclose{}\\right) \\cdot -1, & \\mathrm{otherwise} \\end{array} \\right. \\mathclose{}\\right)$$
 
 <!--
 

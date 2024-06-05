@@ -50,6 +50,6 @@ if __name__ == "__main__":
 
 	print("= " * 40)
 
-	print(f"{ latexify.get_latex(f) = }\n\n")
-	print(f"{ latexify.get_latex(inverse_f) = }")
+	print(f"{ latexify.get_latex(f, reduce_assignments=True) = }\n\n")
+	print(f"{ latexify.get_latex(inverse_f, reduce_assignments=True) = }")
 
