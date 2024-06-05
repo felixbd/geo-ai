@@ -1,6 +1,28 @@
 GEO AI
 ======
 
+$$\\begin{array}{l} a = \\left\\{ \\begin{array}{ll} a, & \\mathrm{if} \\ a \\ge 0 \\\\ a \\cdot -1 + 90, & \\mathrm{otherwise} \\end{array} \\right. \\\\ b = \\left\\{ \\begin{array}{ll} b, & \\mathrm{if} \\ b \\ge 0 \\\\ b \\cdot -1 + 180, & \\mathrm{otherwise} \\end{array} \\right. \\\\ f(a, b) = \\mathopen{}\\left( \\mathrm{round} \\mathopen{}\\left( \\frac{a \\cdot \\mathrm{X\\_SCALE}}{180} \\mathclose{}\\right), \\mathrm{round} \\mathopen{}\\left( \\frac{b \\cdot \\mathrm{Y\\_SCALE}}{360} \\mathclose{}\\right) \\mathclose{}\\right) \\end{array}$$
+
+$$\\begin{array}{l} a = \\frac{x \\cdot 180}{\\mathrm{X\\_SCALE}} \\\\ b = \\frac{y \\cdot 360}{\\mathrm{Y\\_SCALE}} \\\\ a = \\left\\{ \\begin{array}{ll} a, & \\mathrm{if} \\ a \\le 90 \\\\ \\mathopen{}\\left( a - 90 \\mathclose{}\\right) \\cdot -1, & \\mathrm{otherwise} \\end{array} \\right. \\\\ b = \\left\\{ \\begin{array}{ll} b, & \\mathrm{if} \\ b \\le 180 \\\\ \\mathopen{}\\left( b - 180 \\mathclose{}\\right) \\cdot -1, & \\mathrm{otherwise} \\end{array} \\right. \\\\ \\mathrm{inverse\\_f}(x, y) = \\mathopen{}\\left( a, b \\mathclose{}\\right) \\end{array}$$
+
+<!--
+
+## Notes:
+
+Swin Transformer: Hierarchical Vision Transformer using Shifted Windows
+
+TinyViT: Fast Pretraining Distillation for Small Vision Transformers
+
+Reinforcement Learning
+
+V-net (V-Net: Fully Convolutional Neural Networks for Volumetric Medical Image Segmentation)
+
+
+# goal
+
+pred land better than 96%
+
+-->
 
 ## Street View Panoramas
 

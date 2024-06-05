@@ -12,11 +12,19 @@ import os
 
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+import reverse_geocoder as rg
+
+import geopandas as gpd
+from shapely.geometry import Point
+
+OUT_CSV: str = "new-out.csv"
+
+# Load the shapefiles (country and state borders)
+# world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+# states = gpd.read_file('path_to_your_states_shapefile.shp')  # Downloaded separately
 
 
-# TODO: rewrite the function to rely on local mapping from coordinates to country
-#  the web api is way too slow (bottleneck) and unreliable
-def get_country_from_coordinates(lat: float, lng: float) -> str:
+def get_country_from_coordinates_old(lat: float, lng: float) -> str:
     geo_locator = Nominatim(user_agent="geoapiExercises")
     try:
         location = geo_locator.reverse((lat, lng), language='en', exactly_one=True)
@@ -28,7 +36,20 @@ def get_country_from_coordinates(lat: float, lng: float) -> str:
         return str(e)
 
 
-def save_country_to_csv(df_in: pl.DataFrame, out_csv_name: str = "output.csv") -> None:
+def get_country_from_coordinates(lat: float, lng: float) -> str:
+    try:
+        results = rg.search((lat, lng))  # reverse geocoding
+        if results and 'cc' in results[0]:
+            return results[0]['cc']  # cc name
+        else:
+            return "none"
+    except Exception as e:
+        return f"ERROR: {e}"
+
+
+
+
+def save_country_to_csv(df_in: pl.DataFrame, out_csv_name: str = OUT_CSV) -> None:
     rv_df = pl.DataFrame({
         "latitude": pl.Series([], dtype=pl.Float64),
         "longitude": pl.Series([], dtype=pl.Float64),
@@ -58,9 +79,9 @@ def save_country_to_csv(df_in: pl.DataFrame, out_csv_name: str = "output.csv") -
             rv_df.extend(new_row)
     except KeyboardInterrupt as e:
         print("Interrupted by user")
-        rv_df.write_csv(out_csv_name)
+        rv_df.write_csv(f"./{out_csv_name}")
         return
-    
+
     rv_df.write_csv(out_csv_name)
 
 
