@@ -10,11 +10,12 @@ import cartopy.feature as cfeature
 
 
 ROBINSON: bool = True
-
+XR: int = 10
+YR: int = 10
 
 def main() -> None:
     # Create a figure and an axes with a specific projection
-    fig = plt.figure(figsize=(15, 10))
+    fig = plt.figure(figsize=(15, 7))
     if not ROBINSON:
         ax = plt.axes(projection=ccrs.PlateCarree())
     else:
@@ -31,10 +32,10 @@ def main() -> None:
     gl.ylocator = plt.FixedLocator(range(-90, 91, 1))
 
     # Add gridlines every 0.5 degrees
-    for lat in range(-90, 91):
-        ax.plot([-180, 180], [lat, lat], color='gray', linestyle='--', linewidth=0.5, transform=ccrs.PlateCarree())
-    for lon in range(-180, 181):
-    	ax.plot([lon, lon], [-90, 90], color='gray', linestyle='--', linewidth=0.5, transform=ccrs.PlateCarree())
+    for lat in range(-90, 91, XR):
+        ax.plot([-180, 180], [lat, lat], color='red', linestyle='--', linewidth=2, transform=ccrs.PlateCarree())
+    for lon in range(-180, 181, YR):
+    	ax.plot([lon, lon], [-90, 90], color='green', linestyle='--', linewidth=2, transform=ccrs.PlateCarree())
 
     # Set the extent of the map to the world
     # ax.set_extent([-180, 180, -90, 90], crs=ccrs.PlateCarree())
