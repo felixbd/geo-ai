@@ -7,6 +7,7 @@ geo ai
 
 import polars as pl
 from tqdm import tqdm
+import numpy as np
 
 import tensorflow as tf
 from tensorflow.keras.models import Model
@@ -89,8 +90,8 @@ def generate_model() -> tf.keras.models.Model:
     dense_layer = Dense(64, activation='relu')(dense_layer)
 
     # Output layers for y1 and y2
-    output_1 = Dense(1, activation='sigmoid', name='output_1')(dense_layer)  # TODO: adapt activation function
-    output_2 = Dense(1, activation='sigmoid', name='output_2')(dense_layer)  # TODO: adapt activation function
+    output_1 = Dense(1, activation='sigmoid', name='output_1')(dense_layer)
+    output_2 = Dense(1, activation='sigmoid', name='output_2')(dense_layer)
 
     model = Model(inputs=input_layer, outputs=[output_1, output_2])
     model.compile(optimizer="adam",
@@ -103,17 +104,16 @@ def generate_model() -> tf.keras.models.Model:
 def train_model(model: tf.keras.models.Model) -> None:
     rv: list = []
 
-
     df = pl.read_csv("./new-images.csv")
 
-    temp = 5  # df.shape[0]
+    temp = 1_000  # df.shape[0]
 
     for i in tqdm(range(temp), desc="Training model (looping over images)"):
         row = df.row(i)
         lat, lon = row[1], row[2]
         image_path = f"./images/{row[0]}.jpeg"
 
-        rv.append(f"[{i}] -> {lat}:{lon} :: {image_path}")
+        # rv.append([lat, lon, image_path])
 
         # Load the image
         image = tf.io.read_file(image_path)
@@ -121,14 +121,17 @@ def train_model(model: tf.keras.models.Model) -> None:
         image = tf.image.resize(image, (target_height, target_width))
         image = image / 255.0
 
+        rv.append([lat, lon, image])
+
         # Train the model
-        # FIXME: model.fit(image, {'output_1': lat, 'output_2': lon})  # , epochs=50, batch_size=32)  # , validation_split=0.2)
+        # model.fit(image, {'output_1': lat, 'output_2': lon})  # , epochs=50, batch_size=32)  # , validation_split=0.2)
 
-    # save the model
-    # model.save("model.h5")
+    lats = np.array([e[0] for e in rv])
+    lons = np.array([e[1] for e in rv])
+    imgs = np.array([e[2] for e in rv])
 
-    for e in rv:
-        print(e)
+    model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=50, batch_size=32, validation_split=0.2)
+    model.save('my_model-2.keras')  # or `keras.saving.save_model(model, 'my_model.keras')
 
     return
 
@@ -141,3 +144,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
