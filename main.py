@@ -98,13 +98,14 @@ def generate_model() -> tf.keras.models.Model:
     dense_layer = Dense(64, activation='relu')(dense_layer)
 
     # Output layers for y1 and y2
-    output_1 = Dense(1, activation='sigmoid', name='output_1')(dense_layer)
-    output_2 = Dense(1, activation='sigmoid', name='output_2')(dense_layer)
+    output_1 = Dense(1, activation='linear', name='output_1')(dense_layer)
+    output_2 = Dense(1, activation='linear', name='output_2')(dense_layer)
 
     model = Model(inputs=input_layer, outputs=[output_1, output_2])
     model.compile(optimizer="adam",
-                  loss={'output_1': 'binary_crossentropy', 'output_2': 'binary_crossentropy'},
-                  metrics={'output_1': 'accuracy', 'output_2': 'accuracy'})
+                  # loss={'output_1': 'binary_crossentropy', 'output_2': 'binary_crossentropy'},
+                  loss={'output_1': 'mean_squared_error', 'output_2': 'mean_squared_error'},
+                  metrics={'output_1': 'mean_absolute_error', 'output_2': 'mean_absolute_error'})
 
     return model
 
@@ -114,7 +115,7 @@ def train_model(model: tf.keras.models.Model) -> None:
 
     df = pl.read_csv("./new-images.csv")
 
-    temp = 1500  # 1_000  # df.shape[0]
+    temp = 150  # 0  # 1_000  # df.shape[0]
 
     for i in tqdm(range(temp), desc="Training model (looping over images)"):
         row = df.row(i)
@@ -139,8 +140,8 @@ def train_model(model: tf.keras.models.Model) -> None:
     imgs = np.array([e[2] for e in rv])
 
     # model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=50, batch_size=32, validation_split=0.2)
-    model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=3, batch_size=32, validation_split=0.2)
-    model.save('my_model-3.keras')  # or `keras.saving.save_model(model, 'my_model.keras')
+    model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=10, batch_size=5, validation_split=0.2)
+    model.save('my_model-4.keras')  # or `keras.saving.save_model(model, 'my_model.keras')
 
     return
 
@@ -148,7 +149,7 @@ def train_model(model: tf.keras.models.Model) -> None:
 def load_and_predict() -> list[tuple[tuple[float, float], tuple[float, float]]]:
     rv: list[tuple[tuple[float, float], tuple[float, float]]] = []
 
-    model = tf.keras.models.load_model('./my_model-3.keras')
+    model = tf.keras.models.load_model('./my_model-4.keras')
     df = pl.read_csv("./new-images.csv")
 
     df = df.head(1500)
@@ -177,11 +178,11 @@ def load_and_predict() -> list[tuple[tuple[float, float], tuple[float, float]]]:
 def main() -> None:
     # clean_data_frame()
 
-    # """
+    # ""
     model = generate_model()
     train_model(model)
 
-    """
+    # ""
     true_vs_pred = load_and_predict()
     print(f"{ true_vs_pred = }")
 
@@ -207,7 +208,7 @@ def main() -> None:
     print(f"Median absolute error: {median_ae}")
     mean_poisson_dev = mean_poisson_deviance(true_coords_flat, pred_coords_flat)
     print(f"Mean Poisson deviance: {mean_poisson_dev}")
-    # """
+    # ""
 
 
 if __name__ == "__main__":
