@@ -13,7 +13,15 @@ import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 
-X_SCALE: int = 10  # 10  # 1000
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, explained_variance_score, max_error, \
+    mean_squared_log_error, median_absolute_error, mean_poisson_deviance, mean_gamma_deviance, mean_tweedie_deviance, \
+    mean_absolute_percentage_error
+
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score, precision_score, \
+    recall_score, roc_auc_score, roc_curve, balanced_accuracy_score, cohen_kappa_score, matthews_corrcoef
+
+
+X_SCALE: int = 5  # 10  # 1000
 Y_SCALE: int = 10  # 20 # 2000
 
 target_width = 512
@@ -106,7 +114,7 @@ def train_model(model: tf.keras.models.Model) -> None:
 
     df = pl.read_csv("./new-images.csv")
 
-    temp = 1_000  # df.shape[0]
+    temp = 1500  # 1_000  # df.shape[0]
 
     for i in tqdm(range(temp), desc="Training model (looping over images)"):
         row = df.row(i)
@@ -130,16 +138,76 @@ def train_model(model: tf.keras.models.Model) -> None:
     lons = np.array([e[1] for e in rv])
     imgs = np.array([e[2] for e in rv])
 
-    model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=50, batch_size=32, validation_split=0.2)
-    model.save('my_model-2.keras')  # or `keras.saving.save_model(model, 'my_model.keras')
+    # model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=50, batch_size=32, validation_split=0.2)
+    model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=3, batch_size=32, validation_split=0.2)
+    model.save('my_model-3.keras')  # or `keras.saving.save_model(model, 'my_model.keras')
 
     return
 
 
+def load_and_predict() -> list[tuple[tuple[float, float], tuple[float, float]]]:
+    rv: list[tuple[tuple[float, float], tuple[float, float]]] = []
+
+    model = tf.keras.models.load_model('./my_model-3.keras')
+    df = pl.read_csv("./new-images.csv")
+
+    df = df.head(1500)
+    samples = df.sample(10)
+
+    for i in range(10):
+        row = samples.row(i)
+        lat, lon = row[1], row[2]
+        image_path = f"./images/{row[0]}.jpeg"
+
+        # Load the image
+        image = tf.io.read_file(image_path)
+        image = tf.image.decode_jpeg(image, channels=3)
+        image = tf.image.resize(image, (target_height, target_width))
+        image = image / 255.0
+        image = np.expand_dims(image, axis=0)
+
+        # Predict
+        prediction = model.predict(image)
+
+        rv.append(((lat, lon), (prediction[0][0][0], prediction[1][0][0])))
+
+    return rv
+
+
 def main() -> None:
     # clean_data_frame()
+
+    # """
     model = generate_model()
     train_model(model)
+
+    """
+    true_vs_pred = load_and_predict()
+    print(f"{ true_vs_pred = }")
+
+    true_coords = [true for true, pred in true_vs_pred]
+    pred_coords = [pred for true, pred in true_vs_pred]
+    true_coords_flat = [coord for pair in true_coords for coord in pair]
+    pred_coords_flat = [coord for pair in pred_coords for coord in pair]
+    mse = mean_squared_error(true_coords_flat, pred_coords_flat)
+    print(f"Mean squared error: {mse}")
+
+    # further metrics
+    mae = mean_absolute_error(true_coords_flat, pred_coords_flat)
+    print(f"Mean absolute error: {mae}")
+    r2 = r2_score(true_coords_flat, pred_coords_flat)
+    print(f"R2 score: {r2}")
+    explained_variance = explained_variance_score(true_coords_flat, pred_coords_flat)
+    print(f"Explained variance score: {explained_variance}")
+    max_err = max_error(true_coords_flat, pred_coords_flat)
+    print(f"Max error: {max_err}")
+    mse_log = mean_squared_log_error(true_coords_flat, pred_coords_flat)
+    print(f"Mean squared log error: {mse_log}")
+    median_ae = median_absolute_error(true_coords_flat, pred_coords_flat)
+    print(f"Median absolute error: {median_ae}")
+    mean_poisson_dev = mean_poisson_deviance(true_coords_flat, pred_coords_flat)
+    print(f"Mean Poisson deviance: {mean_poisson_dev}")
+    # """
 
 
 if __name__ == "__main__":
