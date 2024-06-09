@@ -10,7 +10,7 @@ For simplifying the problem, we will first convert the given latitude and longit
 
 The function `f` will map the latitude and longitude to the 2D coordinate system, and the function `inverse_f` will map the 2D coordinate system back to the latitude and longitude.
 
-$$f(a, b) = \\mathopen{}\\left( \lfloor  \\frac{\\left\\{ \\begin{array}{ll} a, & \\mathrm{if} \\ a \\ge 0 \\\\ a \\cdot -1 + 90, & \\mathrm{otherwise} \\end{array} \\right. \\cdot \\mathrm{X\\_SCALE}}{180} \rceil,
+$$f(a, b) = \\mathopen{}\\left( \left\lfloor  \\frac{\\left\\{ \\begin{array}{ll} a, & \\mathrm{if} \\ a \\ge 0 \\\\ \| a \| + 90, & \\mathrm{otherwise} \\end{array} \\right. \\cdot \\mathrm{X\\_SCALE}}{180} \right\rceil,
 \\mathrm{round} \\mathopen{}\\left( \\frac{\\left\\{ \\begin{array}{ll} b, & \\mathrm{if} \\ b \\ge 0 \\\\ b \\cdot -1 + 180, & \\mathrm{otherwise} \\end{array} \\right. \\cdot \\mathrm{Y\\_SCALE}}{360} \\mathclose{}\\right) \\mathclose{}\\right)$$
 
 $$\\mathrm{inverse\\_f}(x, y) = \\mathopen{}\\left( \\left\\{ \\begin{array}{ll} \\frac{x \\cdot 180}{\\mathrm{X\\_SCALE}}, & \\mathrm{if} \\ \\frac{x \\cdot 180}{\\mathrm{X\\_SCALE}} \\le 90 \\\\ \\mathopen{}\\left( \\frac{x \\cdot 180}{\\mathrm{X\\_SCALE}} - 90 \\mathclose{}\\right) \\cdot -1, & \\mathrm{otherwise} \\end{array} \\right., \\left\\{ \\begin{array}{ll} \\frac{y \\cdot 360}{\\mathrm{Y\\_SCALE}}, & \\mathrm{if} \\ \\frac{y \\cdot 360}{\\mathrm{Y\\_SCALE}} \\le 180 \\\\ \\mathopen{}\\left( \\frac{y \\cdot 360}{\\mathrm{Y\\_SCALE}} - 180 \\mathclose{}\\right) \\cdot -1, & \\mathrm{otherwise} \\end{array} \\right. \\mathclose{}\\right)$$
