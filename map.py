@@ -17,6 +17,13 @@ ROBINSON: bool = True
 XR: int = 10  # 18
 YR: int = 10  # 36
 
+
+TRUE_VS_PRED_GCS: list = [((36.0, 18.0), (18.0, 36.0)), ((90.0, 54.0), (36.0, 36.0)), ((36.0, 144.0), (36.0, 54.0)),
+                          ((90.0, 54.0), (36.0, 36.0)), ((90.0, 54.0), (72.0, 0.0)), ((-36.0, 72.0), (36.0, 54.0)),
+                          ((36.0, 0.0), (36.0, 36.0)), ((54.0, 18.0), (36.0, 36.0)), ((18.0, 54.0), (36.0, 36.0)),
+                          ((18.0, 54.0), (36.0, 36.0))]
+
+
 def main() -> None:
     # Create a figure and an axes with a specific projection
     fig = plt.figure(figsize=(15, 7))
@@ -25,12 +32,9 @@ def main() -> None:
     else:
         ax = plt.axes(projection=ccrs.Robinson())
 
-
-    # Add features to the map (e.g., coastlines, borders)
     ax.add_feature(cfeature.COASTLINE)
     ax.add_feature(cfeature.BORDERS)
 
-    # Draw gridlines every 0.5 degrees
     gl = ax.gridlines(draw_labels=True, linestyle='--')
     gl.xlocator = plt.FixedLocator(range(-180, 181, 5))
     gl.ylocator = plt.FixedLocator(range(-90, 91, 5))
@@ -47,14 +51,16 @@ def main() -> None:
         if lon == 0:
             ax.plot([lon, lon], [-90, 90], color='blue', linestyle='-', linewidth=lw, transform=ccrs.PlateCarree())
         else:
-    	    ax.plot([lon, lon], [-90, 90], color='green', linestyle='--', linewidth=lw, transform=ccrs.PlateCarree())
+            ax.plot([lon, lon], [-90, 90], color='green', linestyle='--', linewidth=lw, transform=ccrs.PlateCarree())
 
-    # Set the extent of the map to the world
-    # ax.set_extent([-180, 180, -90, 90], crs=ccrs.PlateCarree())
+    # plot true vs predicted GCS (with label as number)
+    s = ['o', 'x', 's', '^', 'v', '<', '>', 'd', 'p', 'h']
+    for i, (true, pred) in enumerate(TRUE_VS_PRED_GCS[:11]):
+        ax.plot(true[1], true[0], f'b{s[i]}', markersize=10, transform=ccrs.PlateCarree(), label=f"True {i}")
+        ax.plot(pred[1], pred[0], f'r{s[i]}', markersize=10, transform=ccrs.PlateCarree(), label=f"Pred {i}")
 
-    # Show the plot
     plt.show()
 
 
 if __name__ == "__main__":
-	main()
+    main()

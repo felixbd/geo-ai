@@ -27,6 +27,8 @@ Y_SCALE: int = 20  # 2000
 target_width: int  = 512
 target_height: int = 256
 
+MODEL_PATH: str = "./my_model_new.keras"
+
 
 def lat_to_id(lat: float) -> int:
     return round((lat if lat >= 0 else (lat * (-1)) + 90) * X_SCALE / 180)
@@ -51,9 +53,9 @@ def id_to_lon(y: int) -> float:
     return rv if rv <= 180 else (rv - 180) * -1
 
 
-def ids_to_gcs(x: int, y: int) -> tuple[float, float]:
+def ids_to_gcs(x: float, y: float) -> tuple[float, float]:
     """ inverse of gcs_to_ids """
-    return id_to_lat(x), id_to_lon(y)
+    return id_to_lat(round(x)), id_to_lon(round(y))
 
 
 def clean_data_frame() -> None:
@@ -114,7 +116,7 @@ def train_model(model: tf.keras.models.Model) -> None:
 
     df = pl.read_csv("./new-images.csv")
 
-    temp = 1500  # 1_000  # df.shape[0]
+    temp = 1_500  # 1_000  # df.shape[0]
 
     for i in tqdm(range(temp), desc="Training model (looping over images)"):
         row = df.row(i)
@@ -139,8 +141,8 @@ def train_model(model: tf.keras.models.Model) -> None:
     imgs = np.array([e[2] for e in rv])
 
     # model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=50, batch_size=32, validation_split=0.2)
-    model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=10, batch_size=5, validation_split=0.2)
-    model.save('my_model.keras')  # or `keras.saving.save_model(model, 'my_model.keras')
+    model.fit(imgs, {'output_1': lats, 'output_2': lons}, epochs=10, batch_size=32, validation_split=0.2)
+    model.save(MODEL_PATH)  # or `keras.saving.save_model(model, MODEL_PATH)
 
     return
 
@@ -148,7 +150,7 @@ def train_model(model: tf.keras.models.Model) -> None:
 def load_and_predict() -> list[tuple[tuple[float, float], tuple[float, float]]]:
     rv: list[tuple[tuple[float, float], tuple[float, float]]] = []
 
-    model = tf.keras.models.load_model('./my_model.keras')
+    model = tf.keras.models.load_model(MODEL_PATH)
     df = pl.read_csv("./new-images.csv")
 
     df = df.head(1500)
@@ -177,11 +179,13 @@ def load_and_predict() -> list[tuple[tuple[float, float], tuple[float, float]]]:
 def main() -> None:
     # clean_data_frame()
 
-    # model = generate_model()
-    # train_model(model)
+    model = generate_model()
+    train_model(model)
 
+    """
     true_vs_pred = load_and_predict()
-    print(f"{ true_vs_pred = }")
+    true_vs_pred_gcs = [(ids_to_gcs(*true), ids_to_gcs(*pred)) for true, pred in true_vs_pred]
+    print(f"{ true_vs_pred = }\n{ true_vs_pred_gcs = }")
 
     true_coords = [true for true, pred in true_vs_pred]
     pred_coords = [pred for true, pred in true_vs_pred]
@@ -205,6 +209,7 @@ def main() -> None:
     print(f"Median absolute error: {median_ae}")
     mean_poisson_dev = mean_poisson_deviance(true_coords_flat, pred_coords_flat)
     print(f"Mean Poisson deviance: {mean_poisson_dev}")
+    """
 
 
 if __name__ == "__main__":
