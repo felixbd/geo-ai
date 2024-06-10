@@ -1,1 +1,7 @@
-# TODO
+tqdm
+tensorflow
+polars
+numpy
+scikit-learn
+matplotlib
+Cartopy
